@@ -1,10 +1,9 @@
 
-const states = {
+export const states = {
     HIDDEN:'hidden',
     MINE :'mine',
     NUMBER:'number',
     MARKED:'marked'
-
 }
 // make a board with element having custom key-value (dataset: DOMstringMap)
 // then add it to the board 
@@ -12,7 +11,6 @@ const states = {
 export function makeBoard (size,numberOfMines){
     let arr = [];
     const minePositions = getMinePositions(size,numberOfMines);
-    console.log(minePositions);
     for(let i=0;i<size;i++){
         let arr2 = [];
         for(let j =0;j<size;j++){
@@ -134,4 +132,14 @@ function findNearMines(tile,board){/// used to find mines near the tiles---- but
 
 function isValidTile(size,x,y){
     return x>=0&&y>=0&&x<size&&y<size;
+}
+
+export function checkWin(board){
+    return board.every(row=>row.every(tile => (tile.status===states.NUMBER)||
+    ((tile.status===states.HIDDEN||tile.status==states.MARKED)&&tile.mine===true))); //// ya to tile mine ho and unreveld ho ya tile number ho
+}
+export function checkLose(board){
+return board.some(row =>
+    row.some(tile => tile.status === states.MINE)
+);
 }
