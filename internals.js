@@ -1,4 +1,4 @@
-import { NUMBER_OF_MINES } from "./main.js";
+
 const states = {
     HIDDEN:'hidden',
     MINE :'mine',
@@ -13,9 +13,9 @@ export function makeBoard (size,numberOfMines){
     let arr = [];
     const minePositions = getMinePositions(size,numberOfMines);
     console.log(minePositions);
-    for(let j=0;j<size;j++){
+    for(let i=0;i<size;i++){
         let arr2 = [];
-        for(let i =0;i<size;i++){
+        for(let j =0;j<size;j++){
             const element = document.createElement('div');
             element.dataset.status = states.HIDDEN;
             arr2.push({
@@ -75,9 +75,63 @@ export function setMineCounter(board,NUMBER_OF_MINES){// update the number of mi
     let ctr = 0;
     board.forEach(row => {
      row.forEach(tile=>{
-        if(tile.status==states.MARKED)ctr++;
+        if(tile.status===states.MARKED)ctr++;
      })   
     });
-    NUMBER_OF_MINES= NUMBER_OF_MINES-ctr;
-    document.getElementById("minesLeft").textContent = NUMBER_OF_MINES;
+    document.getElementById("minesLeft").textContent = NUMBER_OF_MINES-ctr;
+}
+
+export function revealTile(board,tile){
+    // if tile is a mine brust all
+    if(tile.status!==states.HIDDEN)return;
+    else {
+        // it is not revealed 
+        if(tile.mine){
+            tile.status = states.MINE;
+        }
+        else{      // it is not mine then find all mines near it
+            tile.status = states.NUMBER;   
+           const adjTiles = findAdjTiles(tile,board);
+           const nearMines = adjTiles.filter(x=>x.mine);
+          if(nearMines.length>0)tile.element.textContent=nearMines.length;
+          else{
+            tile.element.textContent ='';
+               adjTiles.forEach(adjTile => revealTile(board, adjTile));// logic for recursive calls 
+          
+          }
+        }
+    }
+}
+    function findAdjTiles(tile,board){
+        const adjtiles = [];
+        for(let i=-1;i<=1;i++){
+            for(let j=-1;j<=1;j++){
+                const newx = i+tile.i;
+                const newy = j+tile.j;
+                if(isValidTile(board.length,newx,newy)){
+                    adjtiles.push(board[newx][newy]);
+                }
+            }
+        }
+        return adjtiles;
+    }
+
+function findNearMines(tile,board){/// used to find mines near the tiles---- but of no use
+    let nearMines = 0;
+    for(let i=-1;i<=1;i++){
+        for(let j=-1;j<=1;j++){
+          const newx = i+tile.i;
+          const newy = j+tile.j;
+          if(isValidTile(board.length,newx,newy)){
+            if(board[newx][newy].mine){
+                nearMines++;
+            }
+          }
+        }
+    }
+    return nearMines;
+}
+
+function isValidTile(size,x,y){
+    return x>=0&&y>=0&&x<size&&y<size;
 }
