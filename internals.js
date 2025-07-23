@@ -1,4 +1,4 @@
-
+import { NUMBER_OF_MINES } from "./main.js";
 const states = {
     HIDDEN:'hidden',
     MINE :'mine',
@@ -59,4 +59,25 @@ function getMinePositions(boardSize ,numberOfMines){
         }
     }
     return minesPos;
+}
+
+export function mark(tile){
+    if(tile.status!==states.HIDDEN&&tile.status!==states.MARKED)return;
+    else if(tile.status==states.MARKED){
+        tile.status= states.HIDDEN;
+    }
+    else if(tile.status==states.HIDDEN){
+        tile.status= states.MARKED;
+    }
+}
+
+export function setMineCounter(board,NUMBER_OF_MINES){// update the number of mines according to the board.
+    let ctr = 0;
+    board.forEach(row => {
+     row.forEach(tile=>{
+        if(tile.status==states.MARKED)ctr++;
+     })   
+    });
+    NUMBER_OF_MINES= NUMBER_OF_MINES-ctr;
+    document.getElementById("minesLeft").textContent = NUMBER_OF_MINES;
 }
